@@ -1,0 +1,268 @@
+For an **e-learning + student management + CBT/examination system**, I would recommend a **web application with a separate frontend, backend API, and database** rather than trying to build everything inside one tool.
+
+Given the type of system you're describing, a strong stack would be:
+
+### My recommended stack
+
+| Part             | Tool                                   | Purpose                                         |
+| ---------------- | -------------------------------------- | ----------------------------------------------- |
+| Frontend         | **React + Vite + TypeScript**          | Student, lecturer, admin dashboards             |
+| Backend          | **Node.js + Express/NestJS**           | API, authentication, exams, results             |
+| Database         | **PostgreSQL**                         | Students, courses, questions, attempts, results |
+| Authentication   | **JWT + refresh tokens**               | Secure login/session management                 |
+| File storage     | **Cloudinary / S3-compatible storage** | Course PDFs, videos, images                     |
+| Hosting          | **Hostinger + Railway**                | Frontend + backend                              |
+| Database hosting | **Railway PostgreSQL**                 | Production database                             |
+| Version control  | **GitHub**                             | Source code and deployment                      |
+| UI               | **Tailwind CSS**                       | Modern responsive interface                     |
+
+Since you've already been working with **React/Vite, Node.js and Railway/Hostinger**, I would stay with that ecosystem rather than switching to something completely different.
+
+### Architecture I would use
+
+```text
+                    E-LEARNING PLATFORM
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+         STUDENT PORTAL             ADMIN PORTAL
+              │                         │
+              ├── Dashboard             ├── Dashboard
+              ├── Courses               ├── Students
+              ├── Lessons               ├── Courses
+              ├── Assignments           ├── Lecturers
+              ├── CBT Exams             ├── Questions
+              ├── Results               ├── Exams
+              └── Profile               ├── Results
+                                        └── Reports
+                           │
+                           ▼
+                   React + TypeScript
+                           │
+                           ▼
+                    REST API / JSON
+                           │
+                           ▼
+                   Node.js Backend
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+        PostgreSQL     File Storage    Email/SMS
+```
+
+### The important part: build it in modules
+
+Don't start by building the entire application at once.
+
+I would structure it into these modules:
+
+**1. User management**
+
+* Student registration
+* Student login
+* Admin login
+* Lecturer accounts
+* Roles and permissions
+* Password reset
+* Account activation/deactivation
+* Student profiles
+
+**2. Academic management**
+
+* Departments
+* Programmes
+* Classes
+* Sessions
+* Semesters
+* Courses
+* Course registration
+* Lecturer assignment
+
+**3. E-learning**
+
+* Course materials
+* Video lessons
+* PDF/document lessons
+* Lesson progress
+* Assignments
+* Announcements
+* Discussion/comments
+* Completion tracking
+
+**4. CBT/examination**
+
+This is where I would put considerable attention because your system is intended to manage examinations.
+
+```text
+Exam
+ ├── Instructions
+ ├── Duration
+ ├── Start/end time
+ ├── Number of questions
+ ├── Randomization
+ ├── Question categories
+ ├── Marks per question
+ ├── Pass mark
+ ├── Attempts allowed
+ └── Result settings
+```
+
+Questions could support:
+
+* Multiple choice
+* True/False
+* Multiple response
+* Fill-in-the-blank
+* Essay/theory
+* Image-based questions
+
+For MCQ:
+
+```text
+Question:
+What is the function of RAM?
+
+A. Permanent storage
+B. Temporary data storage
+C. Network connection
+D. Virus protection
+
+Correct answer: B
+Mark: 2
+```
+
+### 5. Examination engine
+
+For a serious CBT system, don't simply put all questions into one HTML page.
+
+The backend should control:
+
+* Exam authentication
+* Exam eligibility
+* Start time
+* End time
+* Countdown
+* Question randomization
+* Option randomization
+* Answer saving
+* Automatic submission
+* Time expiration
+* Attempt tracking
+* Score calculation
+* Result generation
+
+You can also implement **server-side timing**, which is much safer than trusting the student's browser clock.
+
+### 6. Results management
+
+The system should automatically produce:
+
+```text
+Student
+     ↓
+Exam attempt
+     ↓
+Answers
+     ↓
+Automatic marking
+     ↓
+Score
+     ↓
+Percentage
+     ↓
+Grade
+     ↓
+Pass/Fail
+     ↓
+Result record
+```
+
+Then administrators can generate:
+
+* Individual results
+* Class results
+* Course results
+* Examination reports
+* Result sheets
+* Performance statistics
+* Pass/fail statistics
+* Student transcripts
+
+### 7. Admin dashboard
+
+The administrator should be able to see something like:
+
+```text
+┌─────────────────────────────────────────┐
+│             ADMIN DASHBOARD             │
+├────────────┬────────────┬───────────────┤
+│ Students   │ Courses    │ Exams         │
+│ 1,245      │ 48         │ 126           │
+├────────────┼────────────┼───────────────┤
+│ Active     │ Completed  │ Pass Rate     │
+│ Exams: 8   │ Exams: 118 │ 82.4%         │
+└────────────┴────────────┴───────────────┘
+```
+
+### What I would NOT recommend
+
+I wouldn't make the core system dependent on **WordPress plugins** if your goal is a serious institutional system.
+
+WordPress can work for a basic LMS, but your requirements—particularly **student management + CBT + examination control + results + institutional administration**—are better suited to a custom application.
+
+I also wouldn't start with microservices. Build a **well-structured modular monolith** first:
+
+```text
+frontend/
+backend/
+database/
+```
+
+and inside the backend:
+
+```text
+auth/
+users/
+students/
+courses/
+lessons/
+questions/
+exams/
+attempts/
+results/
+notifications/
+reports/
+```
+
+That will be much easier for you to develop and maintain.
+
+### One additional recommendation
+
+Because you have previously been working on a **CBT server concept for nursing/midwifery examinations**, I would design the examination engine so it can eventually support **multiple institutions**.
+
+That means designing it as:
+
+```text
+Platform
+   │
+   ├── Institution A
+   │      ├── Students
+   │      ├── Courses
+   │      └── Exams
+   │
+   ├── Institution B
+   │      ├── Students
+   │      ├── Courses
+   │      └── Exams
+   │
+   └── Institution C
+          ├── Students
+          ├── Courses
+          └── Exams
+```
+
+That gives you a path from a school-specific application to a **multi-tenant e-learning/CBT SaaS platform**.
+
+**If you're building this yourself, my first choice would therefore be: React + TypeScript + Vite → Node.js → PostgreSQL → Railway, with Hostinger serving the frontend/domain.**
+
+If you tell me whether this is for **one school/college or a SaaS system for multiple schools**, I can lay out the exact database schema, folder structure, modules, and development phases before you start coding.
