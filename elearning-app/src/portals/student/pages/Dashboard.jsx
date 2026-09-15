@@ -32,27 +32,47 @@ function formatDate(value) {
 
 function daysUntil(value) {
   const diff = Math.ceil((new Date(value) - new Date()) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return "Overdue";
-  if (diff === 0) return "Due today";
-  if (diff === 1) return "Due tomorrow";
-  return `Due in ${diff} days`;
+  if (diff < 0) return { label: "Overdue", color: "text-red-600" };
+  if (diff === 0) return { label: "Due today", color: "text-red-600" };
+  if (diff <= 2) return { label: `Due in ${diff} day${diff !== 1 ? "s" : ""}`, color: "text-amber-600" };
+  return { label: `Due in ${diff} days`, color: "text-slate-500" };
+}
+
+function progressColor(value) {
+  if (value === 100) return "bg-green-500";
+  if (value >= 50) return "bg-blue-500";
+  return "bg-amber-500";
 }
 
 function ProgressBar({ value }) {
   return (
     <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
       <div
-        className="h-full rounded-full bg-slate-900"
+        className={`h-full rounded-full ${progressColor(value)}`}
         style={{ width: `${value}%` }}
       />
     </div>
   );
 }
 
+const statCards = [
+  { label: "Enrolled Courses", accent: "bg-blue-50 text-blue-700 border-blue-100" },
+  { label: "Avg. Progress", accent: "bg-purple-50 text-purple-700 border-purple-100" },
+  { label: "Pending Assignments", accent: "bg-amber-50 text-amber-700 border-amber-100" },
+  { label: "Upcoming Exams", accent: "bg-rose-50 text-rose-700 border-rose-100" },
+];
+
 export default function Dashboard() {
   const avgProgress = Math.round(
     enrolledCourses.reduce((sum, c) => sum + c.progress, 0) / enrolledCourses.length
   );
+
+  const statValues = [
+    enrolledCourses.length,
+    `${avgProgress}%`,
+    upcomingAssignments.length,
+    upcomingExams.length,
+  ];
 
   return (
     <div>
@@ -64,30 +84,15 @@ export default function Dashboard() {
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-lg border border-slate-200 p-4">
-          <p className="text-xs font-medium text-slate-500">Enrolled Courses</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">
-            {enrolledCourses.length}
-          </p>
-        </div>
-        <div className="rounded-lg border border-slate-200 p-4">
-          <p className="text-xs font-medium text-slate-500">Avg. Progress</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">
-            {avgProgress}%
-          </p>
-        </div>
-        <div className="rounded-lg border border-slate-200 p-4">
-          <p className="text-xs font-medium text-slate-500">Pending Assignments</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">
-            {upcomingAssignments.length}
-          </p>
-        </div>
-        <div className="rounded-lg border border-slate-200 p-4">
-          <p className="text-xs font-medium text-slate-500">Upcoming Exams</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">
-            {upcomingExams.length}
-          </p>
-        </div>
+        {statCards.map((stat, i) => (
+          <div
+            key={stat.label}
+            className={`rounded-lg border p-4 ${stat.accent}`}
+          >
+            <p className="text-xs font-medium opacity-80">{stat.label}</p>
+            <p className="mt-1 text-2xl font-semibold">{statValues[i]}</p>
+          </div>
+        ))}
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -98,7 +103,17 @@ export default function Dashboard() {
               <div key={c.id}>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-slate-900">{c.code}</span>
-                  <span className="text-slate-500">{c.progress}%</span>
+                  <span
+                    className={`font-medium ${
+                      c.progress === 100
+                        ? "text-green-600"
+                        : c.progress >= 50
+                        ? "text-blue-600"
+                        : "text-amber-600"
+                    }`}
+                  >
+                    {c.progress}%
+                  </span>
                 </div>
                 <p className="text-xs text-slate-500">{c.title}</p>
                 <div className="mt-1">
@@ -117,20 +132,23 @@ export default function Dashboard() {
             {upcomingAssignments.length === 0 && (
               <p className="text-sm text-slate-400">No pending assignments.</p>
             )}
-            {upcomingAssignments.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-center justify-between rounded-md border border-slate-100 px-3 py-2"
-              >
-                <div>
-                  <p className="text-sm font-medium text-slate-900">{a.title}</p>
-                  <p className="text-xs text-slate-500">{a.course}</p>
+            {upcomingAssignments.map((a) => {
+              const due = daysUntil(a.dueDate);
+              return (
+                <div
+                  key={a.id}
+                  className="flex items-center justify-between rounded-md border border-amber-100 bg-amber-50/60 px-3 py-2"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">{a.title}</p>
+                    <p className="text-xs text-slate-500">{a.course}</p>
+                  </div>
+                  <span className={`text-xs font-medium ${due.color}`}>
+                    {due.label}
+                  </span>
                 </div>
-                <span className="text-xs font-medium text-amber-600">
-                  {daysUntil(a.dueDate)}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <h2 className="mt-6 text-sm font-medium text-slate-900">
@@ -143,13 +161,13 @@ export default function Dashboard() {
             {upcomingExams.map((e) => (
               <div
                 key={e.id}
-                className="flex items-center justify-between rounded-md border border-slate-100 px-3 py-2"
+                className="flex items-center justify-between rounded-md border border-rose-100 bg-rose-50/60 px-3 py-2"
               >
                 <div>
                   <p className="text-sm font-medium text-slate-900">{e.title}</p>
                   <p className="text-xs text-slate-500">{e.course}</p>
                 </div>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs font-medium text-rose-600">
                   {formatDate(e.date)}
                 </span>
               </div>
@@ -164,20 +182,23 @@ export default function Dashboard() {
           {recentResults.length === 0 && (
             <p className="text-sm text-slate-400">No results yet.</p>
           )}
-          {recentResults.map((r) => (
-            <div
-              key={r.id}
-              className="flex items-center justify-between rounded-md border border-slate-100 px-3 py-2"
-            >
-              <div>
-                <p className="text-sm font-medium text-slate-900">{r.exam}</p>
-                <p className="text-xs text-slate-500">{r.course}</p>
+          {recentResults.map((r) => {
+            const percent = Math.round((r.score / r.total) * 100);
+            return (
+              <div
+                key={r.id}
+                className="flex items-center justify-between rounded-md border border-green-100 bg-green-50/60 px-3 py-2"
+              >
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{r.exam}</p>
+                  <p className="text-xs text-slate-500">{r.course}</p>
+                </div>
+                <span className="text-sm font-semibold text-green-700">
+                  {r.score}/{r.total} ({percent}%)
+                </span>
               </div>
-              <span className="text-sm font-medium text-slate-700">
-                {r.score}/{r.total}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
