@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #0f172a; /* slate-900 */
+    background-color: #f8fafc; /* slate-50, matches the bg-slate-50 used in layouts */
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 500;
+    color: #0f172a;
+  }
+
+  /* Consistent placeholder color across all the search/filter inputs
+     used throughout the admin and student pages */
+  ::placeholder {
+    color: #94a3b8; /* slate-400 */
+    opacity: 1;
+  }
+
+  /* Remove default number input spinners — cleaner for "Points",
+     "Duration", "Students" fields in the admin forms */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  /* Consistent disabled-field styling (matmatric no., department,
+     level fields in Profile.jsx use bg-slate-100 inline already —
+     this backs it up for any disabled input that forgets the class) */
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.75;
+  }
+
+  /* Buttons shouldn't inherit weird default font styles */
+  button {
+    font-family: inherit;
+  }
+
+  /* Links get a sane default; most nav links use Tailwind classes
+     directly, but this catches anywhere that doesn't */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@layer utilities {
+  /* Visually-hidden but still accessible to screen readers — useful
+     for icon-only buttons like the mobile nav hamburger toggle */
+  .sr-only-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}

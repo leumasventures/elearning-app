@@ -1,0 +1,113 @@
+/* App.css — global overrides and utilities layered on top of Tailwind */
+
+/* Custom scrollbar for the main content area and any scrollable panels
+   (sidebar, lesson list, question bank, etc.) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; /* slate-300 */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8; /* slate-400 */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Smooth transitions for progress bars and score bars used in
+   Courses, Dashboard, and Reports */
+.progress-bar-fill {
+  transition: width 400ms ease-in-out;
+}
+
+/* Focus states — Tailwind's default outline gets removed by some
+   browsers on custom elements, so this keeps keyboard navigation
+   visible across forms (auth, admin CRUD forms, exam options) */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid #0f172a; /* slate-900 */
+  outline-offset: 2px;
+}
+
+/* Prevent accidental text selection during the CBT exam-taking flow
+   (clicking through options/timer shouldn't highlight text) */
+.exam-no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Simple fade-in for modals and confirmation dialogs
+   (submit-exam confirm, delete confirms, etc.) */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 150ms ease-out;
+}
+
+/* Simple slide-up for the mobile sidebar overlay used in
+   AdminLayout and StudentLayout */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.slide-in-left {
+  animation: slide-in-left 200ms ease-out;
+}
+
+/* Print styles — used when exporting/printing from Reports and Results
+   pages, so tables print cleanly without sidebar/topbar/buttons */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    border: 1px solid #e2e8f0; /* slate-200 */
+  }
+}
+
+/* Line clamp utility for lesson/course descriptions where Tailwind's
+   line-clamp plugin isn't installed */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
