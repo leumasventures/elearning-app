@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "Assignments", path: "assignments" },
   { label: "CBT exams", path: "exams" },
   { label: "Results", path: "results" },
+  { label: "Billing", path: "payments" },
   { label: "Profile", path: "profile" },
 ];
 

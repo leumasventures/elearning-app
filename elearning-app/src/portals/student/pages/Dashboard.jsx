@@ -4,9 +4,9 @@ const student = {
 };
 
 const enrolledCourses = [
-  { id: 1, code: "CSC101", title: "Introduction to Programming", progress: 65 },
-  { id: 2, code: "MTH201", title: "Calculus II", progress: 40 },
-  { id: 3, code: "ENG150", title: "Technical Writing", progress: 100 },
+  { id: 1, code: "CSC101", title: "Introduction to Programming", progress: 65, color: "indigo" },
+  { id: 2, code: "MTH201", title: "Calculus II", progress: 40, color: "violet" },
+  { id: 3, code: "ENG150", title: "Technical Writing", progress: 100, color: "emerald" },
 ];
 
 const upcomingAssignments = [
@@ -32,34 +32,80 @@ function formatDate(value) {
 
 function daysUntil(value) {
   const diff = Math.ceil((new Date(value) - new Date()) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return { label: "Overdue", color: "text-red-600" };
-  if (diff === 0) return { label: "Due today", color: "text-red-600" };
-  if (diff <= 2) return { label: `Due in ${diff} day${diff !== 1 ? "s" : ""}`, color: "text-amber-600" };
-  return { label: `Due in ${diff} days`, color: "text-slate-500" };
+  if (diff < 0) return { label: "Overdue", color: "text-red-600 bg-red-50 border-red-100" };
+  if (diff === 0) return { label: "Due today", color: "text-red-600 bg-red-50 border-red-100" };
+  if (diff <= 2) return { label: `Due in ${diff} day${diff !== 1 ? "s" : ""}`, color: "text-amber-700 bg-amber-50 border-amber-100" };
+  return { label: `Due in ${diff} days`, color: "text-slate-600 bg-slate-50 border-slate-100" };
 }
 
-function progressColor(value) {
-  if (value === 100) return "bg-green-500";
-  if (value >= 50) return "bg-blue-500";
+function progressBarColor(value) {
+  if (value === 100) return "bg-emerald-500";
+  if (value >= 50) return "bg-indigo-500";
   return "bg-amber-500";
 }
 
 function ProgressBar({ value }) {
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+    <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
       <div
-        className={`h-full rounded-full ${progressColor(value)}`}
+        className={`h-full rounded-full transition-all duration-500 ${progressBarColor(value)}`}
         style={{ width: `${value}%` }}
       />
     </div>
   );
 }
 
-const statCards = [
-  { label: "Enrolled Courses", accent: "bg-blue-50 text-blue-700 border-blue-100" },
-  { label: "Avg. Progress", accent: "bg-purple-50 text-purple-700 border-purple-100" },
-  { label: "Pending Assignments", accent: "bg-amber-50 text-amber-700 border-amber-100" },
-  { label: "Upcoming Exams", accent: "bg-rose-50 text-rose-700 border-rose-100" },
+const courseAccent = {
+  indigo: { badge: "bg-indigo-100 text-indigo-700", ring: "ring-indigo-100" },
+  violet: { badge: "bg-violet-100 text-violet-700", ring: "ring-violet-100" },
+  emerald: { badge: "bg-emerald-100 text-emerald-700", ring: "ring-emerald-100" },
+};
+
+const stats = [
+  {
+    label: "Enrolled Courses",
+    valueKey: "courses",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+    gradient: "from-blue-500 to-indigo-600",
+    soft: "bg-blue-50 text-blue-700 border-blue-100",
+  },
+  {
+    label: "Avg. Progress",
+    valueKey: "progress",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+    ),
+    gradient: "from-violet-500 to-purple-600",
+    soft: "bg-violet-50 text-violet-700 border-violet-100",
+  },
+  {
+    label: "Pending Assignments",
+    valueKey: "assignments",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg>
+    ),
+    gradient: "from-amber-500 to-orange-500",
+    soft: "bg-amber-50 text-amber-700 border-amber-100",
+  },
+  {
+    label: "Upcoming Exams",
+    valueKey: "exams",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    gradient: "from-rose-500 to-pink-600",
+    soft: "bg-rose-50 text-rose-700 border-rose-100",
+  },
 ];
 
 export default function Dashboard() {
@@ -67,118 +113,162 @@ export default function Dashboard() {
     enrolledCourses.reduce((sum, c) => sum + c.progress, 0) / enrolledCourses.length
   );
 
-  const statValues = [
-    enrolledCourses.length,
-    `${avgProgress}%`,
-    upcomingAssignments.length,
-    upcomingExams.length,
-  ];
+  const values = {
+    courses: enrolledCourses.length,
+    progress: `${avgProgress}%`,
+    assignments: upcomingAssignments.length,
+    exams: upcomingExams.length,
+  };
 
   return (
-    <div>
-      <h1 className="text-lg font-medium text-slate-900">
-        Welcome back, {student.name.split(" ")[0]}
-      </h1>
-      <p className="mt-1 text-sm text-slate-500">
-        {student.matric} · Here's what's happening across your courses.
-      </p>
+    <div className="space-y-6">
+      {/* Welcome banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 px-6 py-6 text-white shadow-lg shadow-indigo-200/50">
+        <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -bottom-10 -left-6 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+        <div className="relative">
+          <p className="text-sm font-medium text-indigo-100">Student portal</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+            Welcome back, {student.name.split(" ")[0]} 👋
+          </h1>
+          <p className="mt-1 text-sm text-indigo-100/90">
+            {student.matric} · Here’s what’s happening across your courses.
+          </p>
+        </div>
+      </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {statCards.map((stat, i) => (
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {stats.map((stat) => (
           <div
             key={stat.label}
-            className={`rounded-lg border p-4 ${stat.accent}`}
+            className={`relative overflow-hidden rounded-xl border p-4 shadow-sm ${stat.soft}`}
           >
-            <p className="text-xs font-medium opacity-80">{stat.label}</p>
-            <p className="mt-1 text-2xl font-semibold">{statValues[i]}</p>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium opacity-80">{stat.label}</p>
+                <p className="mt-1.5 text-2xl font-bold tracking-tight">{values[stat.valueKey]}</p>
+              </div>
+              <div className={`rounded-lg bg-gradient-to-br ${stat.gradient} p-2 text-white shadow-md`}>
+                {stat.icon}
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-lg border border-slate-200 p-4">
-          <h2 className="text-sm font-medium text-slate-900">Course Progress</h2>
-          <div className="mt-4 space-y-4">
-            {enrolledCourses.map((c) => (
-              <div key={c.id}>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-900">{c.code}</span>
-                  <span
-                    className={`font-medium ${
-                      c.progress === 100
-                        ? "text-green-600"
-                        : c.progress >= 50
-                        ? "text-blue-600"
-                        : "text-amber-600"
-                    }`}
-                  >
-                    {c.progress}%
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500">{c.title}</p>
-                <div className="mt-1">
-                  <ProgressBar value={c.progress} />
-                </div>
-              </div>
-            ))}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        {/* Course Progress */}
+        <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-900">Course Progress</h2>
+            <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600">
+              {enrolledCourses.length} courses
+            </span>
           </div>
-        </div>
-
-        <div className="rounded-lg border border-slate-200 p-4">
-          <h2 className="text-sm font-medium text-slate-900">
-            Upcoming Assignments
-          </h2>
-          <div className="mt-4 space-y-3">
-            {upcomingAssignments.length === 0 && (
-              <p className="text-sm text-slate-400">No pending assignments.</p>
-            )}
-            {upcomingAssignments.map((a) => {
-              const due = daysUntil(a.dueDate);
+          <div className="mt-5 space-y-5">
+            {enrolledCourses.map((c) => {
+              const accent = courseAccent[c.color] || courseAccent.indigo;
               return (
-                <div
-                  key={a.id}
-                  className="flex items-center justify-between rounded-md border border-amber-100 bg-amber-50/60 px-3 py-2"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">{a.title}</p>
-                    <p className="text-xs text-slate-500">{a.course}</p>
+                <div key={c.id} className={`rounded-lg p-3 ring-1 ${accent.ring} bg-slate-50/50`}>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className={`rounded-md px-2 py-0.5 text-xs font-semibold ${accent.badge}`}>
+                      {c.code}
+                    </span>
+                    <span
+                      className={`font-semibold ${
+                        c.progress === 100
+                          ? "text-emerald-600"
+                          : c.progress >= 50
+                          ? "text-indigo-600"
+                          : "text-amber-600"
+                      }`}
+                    >
+                      {c.progress}%
+                    </span>
                   </div>
-                  <span className={`text-xs font-medium ${due.color}`}>
-                    {due.label}
-                  </span>
+                  <p className="mt-1.5 text-sm font-medium text-slate-800">{c.title}</p>
+                  <div className="mt-2.5">
+                    <ProgressBar value={c.progress} />
+                  </div>
                 </div>
               );
             })}
           </div>
+        </div>
 
-          <h2 className="mt-6 text-sm font-medium text-slate-900">
-            Upcoming Exams
-          </h2>
-          <div className="mt-4 space-y-3">
-            {upcomingExams.length === 0 && (
-              <p className="text-sm text-slate-400">No upcoming exams.</p>
-            )}
-            {upcomingExams.map((e) => (
-              <div
-                key={e.id}
-                className="flex items-center justify-between rounded-md border border-rose-100 bg-rose-50/60 px-3 py-2"
-              >
-                <div>
-                  <p className="text-sm font-medium text-slate-900">{e.title}</p>
-                  <p className="text-xs text-slate-500">{e.course}</p>
+        {/* Assignments + Exams */}
+        <div className="space-y-5">
+          <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-900">Upcoming Assignments</h2>
+              <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                {upcomingAssignments.length} pending
+              </span>
+            </div>
+            <div className="mt-4 space-y-3">
+              {upcomingAssignments.length === 0 && (
+                <p className="text-sm text-slate-400">No pending assignments.</p>
+              )}
+              {upcomingAssignments.map((a) => {
+                const due = daysUntil(a.dueDate);
+                return (
+                  <div
+                    key={a.id}
+                    className="flex items-center justify-between gap-3 rounded-lg border border-amber-100/80 bg-gradient-to-r from-amber-50/80 to-orange-50/40 px-3.5 py-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-slate-900">{a.title}</p>
+                      <p className="text-xs text-slate-500">{a.course}</p>
+                    </div>
+                    <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${due.color}`}>
+                      {due.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-900">Upcoming Exams</h2>
+              <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-700">
+                {upcomingExams.length} scheduled
+              </span>
+            </div>
+            <div className="mt-4 space-y-3">
+              {upcomingExams.length === 0 && (
+                <p className="text-sm text-slate-400">No upcoming exams.</p>
+              )}
+              {upcomingExams.map((e) => (
+                <div
+                  key={e.id}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-rose-100/80 bg-gradient-to-r from-rose-50/80 to-pink-50/40 px-3.5 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-slate-900">{e.title}</p>
+                    <p className="text-xs text-slate-500">{e.course}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-rose-100 bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-700">
+                    {formatDate(e.date)}
+                  </span>
                 </div>
-                <span className="text-xs font-medium text-rose-600">
-                  {formatDate(e.date)}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-6 rounded-lg border border-slate-200 p-4">
-        <h2 className="text-sm font-medium text-slate-900">Recent Results</h2>
-        <div className="mt-4 space-y-2">
+      {/* Recent Results */}
+      <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-slate-900">Recent Results</h2>
+          <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+            Latest scores
+          </span>
+        </div>
+        <div className="mt-4 space-y-2.5">
           {recentResults.length === 0 && (
             <p className="text-sm text-slate-400">No results yet.</p>
           )}
@@ -187,15 +277,20 @@ export default function Dashboard() {
             return (
               <div
                 key={r.id}
-                className="flex items-center justify-between rounded-md border border-green-100 bg-green-50/60 px-3 py-2"
+                className="flex items-center justify-between gap-3 rounded-lg border border-emerald-100/80 bg-gradient-to-r from-emerald-50/80 to-teal-50/40 px-3.5 py-3"
               >
-                <div>
-                  <p className="text-sm font-medium text-slate-900">{r.exam}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-slate-900">{r.exam}</p>
                   <p className="text-xs text-slate-500">{r.course}</p>
                 </div>
-                <span className="text-sm font-semibold text-green-700">
-                  {r.score}/{r.total} ({percent}%)
-                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-sm font-bold text-emerald-700">
+                    {r.score}/{r.total}
+                  </span>
+                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                    {percent}%
+                  </span>
+                </div>
               </div>
             );
           })}

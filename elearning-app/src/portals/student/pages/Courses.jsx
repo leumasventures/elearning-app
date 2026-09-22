@@ -9,6 +9,10 @@ const initialEnrolledCourses = [
     progress: 65,
     lessonsCompleted: 13,
     totalLessons: 20,
+    materials: [
+      { id: 1, type: "PDF", title: "Course Outline", source: "csc101-outline.pdf" },
+      { id: 2, type: "Video", title: "Week 1 - Introduction", source: "week1-intro.mp4" },
+    ],
   },
   {
     id: 2,
@@ -18,6 +22,7 @@ const initialEnrolledCourses = [
     progress: 40,
     lessonsCompleted: 6,
     totalLessons: 15,
+    materials: [],
   },
   {
     id: 3,
@@ -27,6 +32,7 @@ const initialEnrolledCourses = [
     progress: 100,
     lessonsCompleted: 10,
     totalLessons: 10,
+    materials: [],
   },
 ];
 
@@ -47,6 +53,20 @@ const availableCourses = [
   },
 ];
 
+const contentTypeStyles = {
+  Video: "bg-indigo-50 text-indigo-700 ring-indigo-600/20",
+  PDF: "bg-rose-50 text-rose-700 ring-rose-600/20",
+  "Live Class": "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+  Link: "bg-slate-100 text-slate-600 ring-slate-500/20",
+};
+
+const contentActionLabel = {
+  Video: "Watch",
+  PDF: "Download",
+  "Live Class": "Join",
+  Link: "Open",
+};
+
 function ProgressBar({ value }) {
   return (
     <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
@@ -62,12 +82,15 @@ export default function Courses() {
   const [enrolled, setEnrolled] = useState(initialEnrolledCourses);
   const [available, setAvailable] = useState(availableCourses);
   const [search, setSearch] = useState("");
+  const [contentCourseId, setContentCourseId] = useState(null);
 
   const filteredEnrolled = enrolled.filter(
     (c) =>
       c.title.toLowerCase().includes(search.toLowerCase()) ||
       c.code.toLowerCase().includes(search.toLowerCase())
   );
+
+  const contentCourse = enrolled.find((c) => c.id === contentCourseId) || null;
 
   function handleEnroll(course) {
     setAvailable((prev) => prev.filter((c) => c.id !== course.id));
@@ -81,6 +104,7 @@ export default function Courses() {
         progress: 0,
         lessonsCompleted: 0,
         totalLessons: course.lessons,
+        materials: [],
       },
     ]);
   }
@@ -141,6 +165,12 @@ export default function Courses() {
             <button className="mt-4 w-full rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
               {course.progress === 0 ? "Start Course" : "Continue Learning"}
             </button>
+            <button
+              onClick={() => setContentCourseId(course.id)}
+              className="mt-2 w-full rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+            >
+              Course Content ({course.materials.length})
+            </button>
           </div>
         ))}
       </div>
@@ -175,6 +205,63 @@ export default function Courses() {
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {contentCourse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
+          <div className="w-full max-w-lg rounded-lg bg-white p-5 shadow-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-base font-medium text-slate-900">Course Content</h2>
+                <p className="mt-0.5 text-sm text-slate-500">
+                  {contentCourse.code} &middot; {contentCourse.title}
+                </p>
+              </div>
+              <button
+                onClick={() => setContentCourseId(null)}
+                className="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                Close
+              </button>
+            </div>
+
+            <ul className="mt-4 divide-y divide-slate-100 rounded-md border border-slate-200">
+              {contentCourse.materials.length === 0 ? (
+                <li className="px-3 py-6 text-center text-sm text-slate-400">
+                  No content has been uploaded for this course yet.
+                </li>
+              ) : (
+                contentCourse.materials.map((item) => (
+                  <li key={item.id} className="flex items-center justify-between px-3 py-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${contentTypeStyles[item.type]}`}
+                        >
+                          {item.type}
+                        </span>
+                        <span className="truncate text-sm font-medium text-slate-800">{item.title}</span>
+                      </div>
+                      {item.scheduledAt && (
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          {item.scheduledAt.replace("T", " ")}
+                        </p>
+                      )}
+                    </div>
+                    <a
+                      href={item.type === "Video" || item.type === "PDF" ? undefined : item.source}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-3 shrink-0 rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                    >
+                      {contentActionLabel[item.type]}
+                    </a>
+                  </li>
+                ))
+              )}
+            </ul>
           </div>
         </div>
       )}

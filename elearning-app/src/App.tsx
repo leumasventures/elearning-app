@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/login";
 
 import StudentLayout from "./portals/student/StudentLayout";
 import StudentDashboard from "./portals/student/pages/Dashboard";
@@ -7,16 +8,21 @@ import StudentLessons from "./portals/student/pages/Lessons";
 import StudentAssignments from "./portals/student/pages/Assignments";
 import StudentCBTExams from "./portals/student/pages/CBTExams";
 import StudentResults from "./portals/student/pages/Results";
+import StudentBilling from "./portals/student/pages/Billing";
 import StudentProfile from "./portals/student/pages/Profile";
 
 import AdminLayout from "./portals/admin/AdminLayout";
 import AdminDashboard from "./portals/admin/pages/Dashboard";
+import AdminAdmissions from "./portals/admin/pages/Admissions";
 import AdminStudents from "./portals/admin/pages/Students";
 import AdminCourses from "./portals/admin/pages/Courses";
 import AdminLecturers from "./portals/admin/pages/Lecturers";
 import AdminQuestions from "./portals/admin/pages/Questions";
 import AdminExams from "./portals/admin/pages/Exams";
 import AdminResults from "./portals/admin/pages/Results";
+import AdminTranscripts from "./portals/admin/pages/Transcripts";
+import AdminCertifications from "./portals/admin/pages/Certifications";
+import AdminPayments from "./portals/admin/pages/Payments";
 import AdminReports from "./portals/admin/pages/Reports";
 
 // TODO: replace with real auth context once the backend auth flow is wired up.
@@ -26,6 +32,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Navigate to="/student/dashboard" replace />} />
 
         <Route path="/student" element={<StudentLayout user={currentUser} />}>
@@ -36,18 +43,23 @@ export default function App() {
           <Route path="assignments" element={<StudentAssignments />} />
           <Route path="exams" element={<StudentCBTExams />} />
           <Route path="results" element={<StudentResults />} />
+          <Route path="payments" element={<StudentBilling />} />
           <Route path="profile" element={<StudentProfile />} />
         </Route>
 
         <Route path="/admin" element={<AdminLayout user={currentUser} />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="admissions" element={<AdminAdmissions />} />
           <Route path="students" element={<AdminStudents />} />
           <Route path="courses" element={<AdminCourses />} />
           <Route path="lecturers" element={<AdminLecturers />} />
           <Route path="questions" element={<AdminQuestions />} />
           <Route path="exams" element={<AdminExams />} />
           <Route path="results" element={<AdminResults />} />
+          <Route path="transcripts" element={<AdminTranscripts />} />
+          <Route path="certifications" element={<AdminCertifications />} />
+          <Route path="payments" element={<AdminPayments />} />
           <Route path="reports" element={<AdminReports />} />
         </Route>
       </Routes>
