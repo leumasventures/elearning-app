@@ -1,41 +1,7 @@
 import { useState } from "react";
 
-const courseOptions = ["CSC101", "MTH201", "ENG150"];
-
-const initialQuestions = [
-  {
-    id: 1,
-    course: "CSC101",
-    type: "MCQ",
-    text: "Which of the following is not a programming language?",
-    options: ["Python", "Java", "HTML", "Photoshop"],
-    correctIndex: 3,
-    points: 2,
-  },
-  {
-    id: 2,
-    course: "MTH201",
-    type: "True/False",
-    text: "The derivative of a constant is always zero.",
-    options: ["True", "False"],
-    correctIndex: 0,
-    points: 1,
-  },
-  {
-    id: 3,
-    course: "ENG150",
-    type: "MCQ",
-    text: "Which of these best describes technical writing?",
-    options: [
-      "Creative storytelling",
-      "Clear, factual communication for a specific purpose",
-      "Poetry with technical themes",
-      "Informal conversation",
-    ],
-    correctIndex: 1,
-    points: 2,
-  },
-];
+const courseOptions = [];
+const initialQuestions = [];
 
 const emptyForm = {
   course: courseOptions[0],

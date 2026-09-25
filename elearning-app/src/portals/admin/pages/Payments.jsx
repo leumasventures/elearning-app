@@ -3,68 +3,7 @@ import { useState } from "react";
 const feeTypes = ["Registration", "Tuition", "Certification Fee", "Exam Fee"];
 const methods = ["Bank Transfer", "Card", "Cash", "POS"];
 
-const initialPayments = [
-  {
-    id: 1,
-    student: "Chinedu Okafor",
-    matric: "CSC/2023/041",
-    course: "CSC101",
-    feeType: "Tuition",
-    amountDue: 45000,
-    amountPaid: 45000,
-    method: "Bank Transfer",
-    date: "2026-09-15",
-    receiptNo: "RCT-1001",
-  },
-  {
-    id: 2,
-    student: "Amaka Eze",
-    matric: "CSC/2023/017",
-    course: "CSC101",
-    feeType: "Registration",
-    amountDue: 20000,
-    amountPaid: 10000,
-    method: "Card",
-    date: "2026-09-14",
-    receiptNo: "RCT-1002",
-  },
-  {
-    id: 3,
-    student: "Tunde Bakare",
-    matric: "MTH/2023/009",
-    course: "MTH201",
-    feeType: "Certification Fee",
-    amountDue: 15000,
-    amountPaid: 15000,
-    method: "Cash",
-    date: "2026-09-13",
-    receiptNo: "RCT-1003",
-  },
-  {
-    id: 4,
-    student: "Fatima Bello",
-    matric: "ENG/2023/003",
-    course: "ENG150",
-    feeType: "Tuition",
-    amountDue: 60000,
-    amountPaid: 0,
-    method: "Bank Transfer",
-    date: "2026-09-10",
-    receiptNo: "RCT-1004",
-  },
-  {
-    id: 5,
-    student: "Bassey Etim",
-    matric: "LIN/2026/0142",
-    course: "CYBSEC-P",
-    feeType: "Tuition",
-    amountDue: 85000,
-    amountPaid: 85000,
-    method: "Bank Transfer",
-    date: "2026-09-05",
-    receiptNo: "RCT-1005",
-  },
-];
+const initialPayments = [];
 
 const emptyForm = {
   student: "",

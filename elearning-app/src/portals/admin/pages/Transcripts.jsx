@@ -1,48 +1,6 @@
 import { useState } from "react";
 
-const students = [
-  {
-    id: 1,
-    name: "Chinedu Okafor",
-    matric: "CSC/2023/041",
-    program: "B.Sc. Computer Science",
-    admissionDate: "2023-09-01",
-    courses: [
-      { code: "CSC101", title: "Introduction to Computer Science", score: 82, total: 100 },
-      { code: "MTH101", title: "General Mathematics I", score: 74, total: 100 },
-    ],
-  },
-  {
-    id: 2,
-    name: "Amaka Eze",
-    matric: "CSC/2023/017",
-    program: "B.Sc. Computer Science",
-    admissionDate: "2023-09-01",
-    courses: [
-      { code: "CSC101", title: "Introduction to Computer Science", score: 58, total: 100 },
-    ],
-  },
-  {
-    id: 3,
-    name: "Tunde Bakare",
-    matric: "MTH/2023/009",
-    program: "B.Sc. Mathematics",
-    admissionDate: "2023-09-01",
-    courses: [
-      { code: "MTH201", title: "Linear Algebra", score: 71, total: 100 },
-    ],
-  },
-  {
-    id: 4,
-    name: "Bassey Etim",
-    matric: "LIN/2026/0142",
-    program: "Cybersecurity Fundamentals (Professional Certification)",
-    admissionDate: "2026-09-05",
-    courses: [
-      { code: "CYBSEC-P", title: "Cybersecurity Fundamentals", score: 88, total: 100 },
-    ],
-  },
-];
+const students = [];
 
 function getGrade(percent) {
   if (percent >= 70) return "A";

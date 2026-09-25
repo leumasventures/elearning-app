@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-const courseOptions = ["All Courses", "CSC101", "MTH201", "ENG150"];
+const courseOptions = [];
 
 const summaryStats = [
   {
     label: "Total Students",
-    value: "105",
+    value: "",
     gradient: "from-blue-500 to-cyan-500",
     soft: "bg-blue-50 border-blue-100 text-blue-900",
     icon: (
@@ -16,7 +16,7 @@ const summaryStats = [
   },
   {
     label: "Exams Conducted",
-    value: "12",
+    value: "",
     gradient: "from-indigo-500 to-violet-600",
     soft: "bg-indigo-50 border-indigo-100 text-indigo-900",
     icon: (
@@ -27,7 +27,7 @@ const summaryStats = [
   },
   {
     label: "Average Score",
-    value: "74%",
+    value: "0%",
     gradient: "from-amber-500 to-orange-500",
     soft: "bg-amber-50 border-amber-100 text-amber-900",
     icon: (
@@ -38,7 +38,7 @@ const summaryStats = [
   },
   {
     label: "Overall Pass Rate",
-    value: "88%",
+    value: "0%",
     gradient: "from-emerald-500 to-teal-600",
     soft: "bg-emerald-50 border-emerald-100 text-emerald-900",
     icon: (

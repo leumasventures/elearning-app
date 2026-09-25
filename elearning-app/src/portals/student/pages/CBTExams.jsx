@@ -1,51 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const initialExams = [
-  {
-    id: 1,
-    title: "Mid-Semester Test",
-    course: "CSC101",
-    duration: 5, // minutes, short for demo purposes
-    status: "Available",
-    attempted: false,
-    score: null,
-    questions: [
-      {
-        id: "q1",
-        text: "Which of the following is not a programming language?",
-        options: ["Python", "Java", "HTML", "Photoshop"],
-        correctIndex: 3,
-      },
-      {
-        id: "q2",
-        text: "What does 'CPU' stand for?",
-        options: [
-          "Central Process Unit",
-          "Central Processing Unit",
-          "Computer Personal Unit",
-          "Central Processor Utility",
-        ],
-        correctIndex: 1,
-      },
-      {
-        id: "q3",
-        text: "In JavaScript, which keyword declares a constant?",
-        options: ["var", "let", "const", "define"],
-        correctIndex: 2,
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "First Semester Final",
-    course: "ENG150",
-    duration: 30,
-    status: "Closed",
-    attempted: true,
-    score: 18,
-    questions: [],
-  },
-];
+const initialExams = [];
 
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60).toString().padStart(2, "0");

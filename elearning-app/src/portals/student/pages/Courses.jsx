@@ -1,57 +1,8 @@
 import { useState } from "react";
 
-const initialEnrolledCourses = [
-  {
-    id: 1,
-    code: "CSC101",
-    title: "Introduction to Programming",
-    lecturer: "Dr. A. Obi",
-    progress: 65,
-    lessonsCompleted: 13,
-    totalLessons: 20,
-    materials: [
-      { id: 1, type: "PDF", title: "Course Outline", source: "csc101-outline.pdf" },
-      { id: 2, type: "Video", title: "Week 1 - Introduction", source: "week1-intro.mp4" },
-    ],
-  },
-  {
-    id: 2,
-    code: "MTH201",
-    title: "Calculus II",
-    lecturer: "Prof. F. Adeyemi",
-    progress: 40,
-    lessonsCompleted: 6,
-    totalLessons: 15,
-    materials: [],
-  },
-  {
-    id: 3,
-    code: "ENG150",
-    title: "Technical Writing",
-    lecturer: "Mrs. C. Nwosu",
-    progress: 100,
-    lessonsCompleted: 10,
-    totalLessons: 10,
-    materials: [],
-  },
-];
+const initialEnrolledCourses = [];
 
-const availableCourses = [
-  {
-    id: 4,
-    code: "PHY102",
-    title: "General Physics II",
-    lecturer: "Dr. K. Musa",
-    lessons: 18,
-  },
-  {
-    id: 5,
-    code: "CSC205",
-    title: "Data Structures",
-    lecturer: "Dr. A. Obi",
-    lessons: 22,
-  },
-];
+const availableCourses = [];
 
 const contentTypeStyles = {
   Video: "bg-indigo-100 text-indigo-800 ring-1 ring-indigo-200/80",

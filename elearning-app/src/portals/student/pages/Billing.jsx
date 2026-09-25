@@ -1,34 +1,6 @@
 import { useState } from "react";
 
-const invoices = [
-  {
-    id: 1,
-    feeType: "Registration",
-    course: "CSC101",
-    amountDue: 20000,
-    amountPaid: 20000,
-    date: "2026-08-15",
-    receiptNo: "RCT-0991",
-  },
-  {
-    id: 2,
-    feeType: "Tuition",
-    course: "CSC101",
-    amountDue: 45000,
-    amountPaid: 30000,
-    date: "2026-09-05",
-    receiptNo: "RCT-1023",
-  },
-  {
-    id: 3,
-    feeType: "Certification Fee",
-    course: "CSC101",
-    amountDue: 15000,
-    amountPaid: 0,
-    date: null,
-    receiptNo: null,
-  },
-];
+const invoices = [];
 
 function formatNaira(n) {
   return `₦${Number(n).toLocaleString()}`;

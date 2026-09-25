@@ -1,52 +1,7 @@
 import { useState } from "react";
 import { certificationOptions } from "./Courses";
 
-const initialCertificates = [
-  {
-    id: 1,
-    student: "Chinedu Okafor",
-    matric: "CSC/2023/041",
-    course: "CSC101",
-    type: "Certificate of Completion",
-    completionDate: "2026-08-30",
-    certificateId: "LIN-CERT-2026-0001",
-    status: "Issued",
-    issueDate: "2026-09-02",
-  },
-  {
-    id: 2,
-    student: "Bassey Etim",
-    matric: "LIN/2026/0142",
-    course: "CYBSEC-P",
-    type: "Professional Certification",
-    completionDate: "2026-09-10",
-    certificateId: null,
-    status: "Pending",
-    issueDate: null,
-  },
-  {
-    id: 3,
-    student: "Halima Sule",
-    matric: "LIN/2026/0141",
-    course: "DATA-B",
-    type: "Certificate of Proficiency",
-    completionDate: "2026-09-08",
-    certificateId: "LIN-CERT-2026-0002",
-    status: "Issued",
-    issueDate: "2026-09-09",
-  },
-  {
-    id: 4,
-    student: "Tunde Bakare",
-    matric: "MTH/2023/009",
-    course: "MTH201",
-    type: "Certificate of Completion",
-    completionDate: "2026-07-20",
-    certificateId: "LIN-CERT-2026-0003",
-    status: "Revoked",
-    issueDate: "2026-07-25",
-  },
-];
+const initialCertificates = [];
 
 const emptyForm = {
   student: "",

@@ -1,80 +1,235 @@
-const stats = [
-  {
-    label: "Students",
-    value: "1,245",
-    change: "+32 this month",
-    changeType: "up",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-    ),
-    gradient: "from-blue-500 to-cyan-500",
-    soft: "bg-blue-50 border-blue-100 text-blue-800",
-  },
-  {
-    label: "Courses",
-    value: "48",
-    change: "6 active this term",
-    changeType: "neutral",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-    ),
-    gradient: "from-indigo-500 to-violet-600",
-    soft: "bg-indigo-50 border-indigo-100 text-indigo-800",
-  },
-  {
-    label: "Exams",
-    value: "126",
-    change: "8 currently live",
-    changeType: "up",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-      </svg>
-    ),
-    gradient: "from-rose-500 to-pink-600",
-    soft: "bg-rose-50 border-rose-100 text-rose-800",
-  },
-  {
-    label: "Pass Rate",
-    value: "82.4%",
-    change: "+2.1% vs last term",
-    changeType: "up",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    gradient: "from-emerald-500 to-teal-600",
-    soft: "bg-emerald-50 border-emerald-100 text-emerald-800",
-  },
-];
+/** Academic year starts in September (month index 8). */
+function getCurrentAcademicYear(date = new Date()) {
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0 = Jan … 8 = Sep
+  if (month >= 8) return `${year}/${year + 1}`;
+  return `${year - 1}/${year}`;
+}
 
-const secondaryStats = [
-  { label: "Active Exams", value: "8", color: "bg-amber-500", soft: "bg-amber-50 text-amber-800 border-amber-100" },
-  { label: "Completed Exams", value: "118", color: "bg-emerald-500", soft: "bg-emerald-50 text-emerald-800 border-emerald-100" },
-  { label: "Lecturers", value: "36", color: "bg-violet-500", soft: "bg-violet-50 text-violet-800 border-violet-100" },
-  { label: "Questions Bank", value: "2,840", color: "bg-cyan-500", soft: "bg-cyan-50 text-cyan-800 border-cyan-100" },
-];
+function getCurrentTermName(date = new Date()) {
+  const m = date.getMonth();
+  if (m >= 8 && m <= 11) return "Batch C"; // Sep–Dec
+  if (m >= 0 && m <= 3) return "Batch B"; // Jan–Apr
+  return "Batch A"; // May–Aug
+}
 
-const recentActivity = [
-  { id: 1, type: "exam", title: "Mid-Semester Test — CSC101", meta: "Started 2 hours ago · 42 students", badge: "Live", badgeColor: "bg-rose-100 text-rose-700" },
-  { id: 2, type: "result", title: "ENG150 Final Results published", meta: "28 students graded · Avg 78%", badge: "Results", badgeColor: "bg-emerald-100 text-emerald-700" },
-  { id: 3, type: "student", title: "12 new students registered", meta: "Computer Science · Level 100", badge: "Students", badgeColor: "bg-blue-100 text-blue-700" },
-  { id: 4, type: "course", title: "MTH201 materials updated", meta: "3 new lessons · Dr. Adeyemi", badge: "Course", badgeColor: "bg-indigo-100 text-indigo-700" },
-];
+// ─── inlined panel (no external import) ────────────────────────────────────
 
-const topCourses = [
-  { code: "CSC101", title: "Introduction to Programming", students: 42, passRate: 88 },
-  { code: "MTH201", title: "Calculus II", students: 35, passRate: 74 },
-  { code: "ENG150", title: "Technical Writing", students: 28, passRate: 91 },
-  { code: "PHY110", title: "General Physics", students: 31, passRate: 69 },
+function monitorProgram(p, now = new Date()) {
+  const start = p.startDate ? new Date(p.startDate) : null;
+  const end = p.endDate
+    ? new Date(p.endDate)
+    : start && p.durationWeeks
+      ? new Date(start.getTime() + p.durationWeeks * 7 * 24 * 60 * 60 * 1000)
+      : null;
+
+  const durationDays =
+    start && end
+      ? Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)))
+      : (p.durationWeeks || 0) * 7;
+
+  const elapsed = start
+    ? Math.max(0, Math.round((now - start) / (1000 * 60 * 60 * 24)))
+    : 0;
+
+  const remaining = end
+    ? Math.max(0, Math.round((end - now) / (1000 * 60 * 60 * 24)))
+    : Math.max(0, durationDays - elapsed);
+
+  const timeUsedPct =
+    durationDays > 0 ? Math.round((elapsed / durationDays) * 100) : 0;
+  const progress = Number(p.progress ?? 0);
+
+  let status = "On track";
+  if (progress >= 100) status = "Completed";
+  else if (remaining === 0 && progress < 100) status = "Overdue";
+  else if (timeUsedPct > progress + 15) status = "At risk";
+
+  return {
+    durationWeeks: p.durationWeeks ?? Math.round(durationDays / 7),
+    elapsed,
+    remaining,
+    timeUsedPct,
+    progress,
+    status,
+  };
+}
+
+function statusStyles(status) {
+  switch (status) {
+    case "Completed":
+      return "bg-emerald-100 text-emerald-800";
+    case "On track":
+      return "bg-sky-100 text-sky-800";
+    case "At risk":
+      return "bg-amber-100 text-amber-800";
+    case "Overdue":
+      return "bg-rose-100 text-rose-800";
+    default:
+      return "bg-slate-100 text-slate-600";
+  }
+}
+
+function LearnerProgramDurationPanel({ programs = [] }) {
+  const monitored = programs.map((p) => ({ ...p, ...monitorProgram(p) }));
+  const atRisk = monitored.filter(
+    (p) => p.status === "At risk" || p.status === "Overdue"
+  ).length;
+
+  return (
+    <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 className="text-sm font-semibold text-slate-900">
+            Learner program duration
+          </h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Planned length vs time used and completion progress
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+            {monitored.length} active
+          </span>
+          {atRisk > 0 && (
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+              {atRisk} need attention
+            </span>
+          )}
+        </div>
+      </div>
+
+      {monitored.length === 0 ? (
+        <p className="mt-4 text-sm text-slate-400">
+          No learner programs yet. Durations appear when students are enrolled.
+        </p>
+      ) : (
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 text-xs text-slate-500">
+                <th className="pb-2 pr-3 font-medium">Learner</th>
+                <th className="pb-2 pr-3 font-medium">Program</th>
+                <th className="pb-2 pr-3 font-medium">Duration</th>
+                <th className="pb-2 pr-3 font-medium">Time used</th>
+                <th className="pb-2 pr-3 font-medium">Progress</th>
+                <th className="pb-2 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {monitored.map((p) => (
+                <tr
+                  key={p.id ?? `${p.matric}-${p.courseCode}`}
+                  className="align-top"
+                >
+                  <td className="py-3 pr-3">
+                    <p className="font-medium text-slate-900">
+                      {p.student ?? "—"}
+                    </p>
+                    <p className="text-xs text-slate-500">{p.matric ?? ""}</p>
+                  </td>
+                  <td className="py-3 pr-3">
+                    <p className="text-slate-800">{p.program ?? "—"}</p>
+                    <p className="text-xs text-slate-500">
+                      {p.courseCode ?? ""}
+                    </p>
+                  </td>
+                  <td className="py-3 pr-3 text-slate-700">
+                    <p>{p.durationWeeks ?? 0} weeks</p>
+                    <p className="text-xs text-slate-500">
+                      {p.remaining ?? 0}d left
+                    </p>
+                  </td>
+                  <td className="min-w-[120px] py-3 pr-3">
+                    <div className="mb-1 flex justify-between text-xs text-slate-600">
+                      <span>{p.timeUsedPct ?? 0}%</span>
+                      <span>{p.elapsed ?? 0}d</span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-indigo-500"
+                        style={{
+                          width: `${Math.min(p.timeUsedPct ?? 0, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </td>
+                  <td className="min-w-[120px] py-3 pr-3">
+                    <div className="mb-1 flex justify-between text-xs text-slate-600">
+                      <span>{p.progress ?? 0}%</span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-emerald-500"
+                        style={{
+                          width: `${Math.min(p.progress ?? 0, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </td>
+                  <td className="py-3">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusStyles(
+                        p.status
+                      )}`}
+                    >
+                      {p.status ?? "—"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── rest of your admin Dashboard below (no import of LearnerProgramDurationPanel) ───
+const stats = [];
+const secondaryStats = [];
+const recentActivity = [];
+const topCourses = [];
+
+// Demo data so the panel is visible while you wire the real API
+const learnerPrograms = [
+  {
+    id: "1",
+    student: "Ada Lovelace",
+    matric: "CS/2024/001",
+    program: "Full-Stack Web Development",
+    courseCode: "FSW-101",
+    durationWeeks: 12,
+    startDate: "2026-01-15",
+    progress: 42,
+  },
+  {
+    id: "2",
+    student: "Alan Turing",
+    matric: "CS/2024/014",
+    program: "Data Science Foundations",
+    courseCode: "DSF-201",
+    durationWeeks: 10,
+    startDate: "2025-11-01",
+    progress: 78,
+  },
+  {
+    id: "3",
+    student: "Grace Hopper",
+    matric: "CS/2023/088",
+    program: "Cloud Engineering",
+    courseCode: "CLE-301",
+    durationWeeks: 16,
+    startDate: "2025-09-01",
+    progress: 55,
+  },
 ];
 
 export default function Dashboard() {
+  const academicYear = getCurrentAcademicYear();
+  const termName = getCurrentTermName();
+
   return (
     <div className="space-y-6">
       {/* Header banner */}
@@ -84,17 +239,19 @@ export default function Dashboard() {
         <div className="relative flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-medium text-slate-400">Admin portal</p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">Platform Overview</h1>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+              Platform Overview
+            </h1>
             <p className="mt-1 text-sm text-slate-400">
               Real-time snapshot of students, courses, exams and performance.
             </p>
           </div>
-          <div className="mt-3 flex gap-2 sm:mt-0">
+          <div className="mt-3 flex flex-wrap gap-2 sm:mt-0">
             <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-500/30">
               System healthy
             </span>
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-slate-300">
-              Term: 2025/2026
+              Term: {academicYear} · {termName}
             </span>
           </div>
         </div>
@@ -102,6 +259,11 @@ export default function Dashboard() {
 
       {/* Primary stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {stats.length === 0 && (
+          <p className="col-span-full text-sm text-slate-400">
+            No stats yet. Data will appear once the platform is in use.
+          </p>
+        )}
         {stats.map((stat) => (
           <div
             key={stat.label}
@@ -110,7 +272,9 @@ export default function Dashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-medium opacity-80">{stat.label}</p>
-                <p className="mt-1.5 text-2xl font-bold tracking-tight">{stat.value}</p>
+                <p className="mt-1.5 text-2xl font-bold tracking-tight">
+                  {stat.value}
+                </p>
                 <p
                   className={`mt-1 text-xs font-medium ${
                     stat.changeType === "up"
@@ -121,7 +285,9 @@ export default function Dashboard() {
                   {stat.change}
                 </p>
               </div>
-              <div className={`rounded-lg bg-gradient-to-br ${stat.gradient} p-2 text-white shadow-md`}>
+              <div
+                className={`rounded-lg bg-gradient-to-br ${stat.gradient} p-2 text-white shadow-md`}
+              >
                 {stat.icon}
               </div>
             </div>
@@ -149,22 +315,31 @@ export default function Dashboard() {
         {/* Recent activity */}
         <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm lg:col-span-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-900">Recent Activity</h2>
+            <h2 className="text-sm font-semibold text-slate-900">
+              Recent Activity
+            </h2>
             <button className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
               View all
             </button>
           </div>
           <div className="mt-4 space-y-3">
+            {recentActivity.length === 0 && (
+              <p className="text-sm text-slate-400">No recent activity.</p>
+            )}
             {recentActivity.map((item) => (
               <div
                 key={item.id}
                 className="flex items-start justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50/60 px-3.5 py-3 transition hover:bg-slate-50"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-900">{item.title}</p>
+                  <p className="truncate text-sm font-medium text-slate-900">
+                    {item.title}
+                  </p>
                   <p className="mt-0.5 text-xs text-slate-500">{item.meta}</p>
                 </div>
-                <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${item.badgeColor}`}>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${item.badgeColor}`}
+                >
                   {item.badge}
                 </span>
               </div>
@@ -181,6 +356,9 @@ export default function Dashboard() {
             </span>
           </div>
           <div className="mt-4 space-y-4">
+            {topCourses.length === 0 && (
+              <p className="text-sm text-slate-400">No courses yet.</p>
+            )}
             {topCourses.map((c, i) => (
               <div key={c.code}>
                 <div className="flex items-center justify-between text-sm">
@@ -201,7 +379,14 @@ export default function Dashboard() {
                 <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500"
-                    style={{ width: `${(c.students / 42) * 100}%` }}
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        (c.students /
+                          Math.max(...topCourses.map((t) => t.students), 1)) *
+                          100
+                      )}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -210,15 +395,34 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Learner program duration panel */}
+      <LearnerProgramDurationPanel programs={learnerPrograms} />
+
       {/* Quick actions */}
       <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
         <h2 className="text-sm font-semibold text-slate-900">Quick Actions</h2>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { label: "Add Student", href: "/admin/students", color: "from-blue-500 to-cyan-500" },
-            { label: "Create Exam", href: "/admin/exams", color: "from-rose-500 to-pink-500" },
-            { label: "Add Course", href: "/admin/courses", color: "from-indigo-500 to-violet-500" },
-            { label: "View Reports", href: "/admin/reports", color: "from-emerald-500 to-teal-500" },
+            {
+              label: "Add Student",
+              href: "/admin/students",
+              color: "from-blue-500 to-cyan-500",
+            },
+            {
+              label: "Create Exam",
+              href: "/admin/exams",
+              color: "from-rose-500 to-pink-500",
+            },
+            {
+              label: "Add Course",
+              href: "/admin/courses",
+              color: "from-indigo-500 to-violet-500",
+            },
+            {
+              label: "View Reports",
+              href: "/admin/reports",
+              color: "from-emerald-500 to-teal-500",
+            },
           ].map((action) => (
             <a
               key={action.label}

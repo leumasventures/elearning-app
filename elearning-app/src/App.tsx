@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/login";
 
 import StudentLayout from "./portals/student/StudentLayout";
@@ -24,45 +26,100 @@ import AdminTranscripts from "./portals/admin/pages/Transcripts";
 import AdminCertifications from "./portals/admin/pages/Certifications";
 import AdminPayments from "./portals/admin/pages/Payments";
 import AdminReports from "./portals/admin/pages/Reports";
+import AdminSettings from "./portals/admin/pages/Settings";
 
-// TODO: replace with real auth context once the backend auth flow is wired up.
-const currentUser = { name: "Jane Doe", role: "student", tenantName: "SAHARCO" };
+function HomeRedirect() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === "admin" || user.role === "lecturer") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  return <Navigate to="/student/dashboard" replace />;
+}
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Navigate to="/student/dashboard" replace />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<HomeRedirect />} />
 
-        <Route path="/student" element={<StudentLayout user={currentUser} />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<StudentDashboard />} />
-          <Route path="courses" element={<StudentCourses />} />
-          <Route path="lessons" element={<StudentLessons />} />
-          <Route path="assignments" element={<StudentAssignments />} />
-          <Route path="exams" element={<StudentCBTExams />} />
-          <Route path="results" element={<StudentResults />} />
-          <Route path="payments" element={<StudentBilling />} />
-          <Route path="profile" element={<StudentProfile />} />
-        </Route>
+          <Route
+            path="/student"
+            element={
+              <ProtectedRoute roles={["student"]}>
+                <StudentLayoutBridge />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="courses" element={<StudentCourses />} />
+            <Route path="lessons" element={<StudentLessons />} />
+            <Route path="assignments" element={<StudentAssignments />} />
+            <Route path="exams" element={<StudentCBTExams />} />
+            <Route path="results" element={<StudentResults />} />
+            <Route path="payments" element={<StudentBilling />} />
+            <Route path="profile" element={<StudentProfile />} />
+          </Route>
 
-        <Route path="/admin" element={<AdminLayout user={currentUser} />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="admissions" element={<AdminAdmissions />} />
-          <Route path="students" element={<AdminStudents />} />
-          <Route path="courses" element={<AdminCourses />} />
-          <Route path="lecturers" element={<AdminLecturers />} />
-          <Route path="questions" element={<AdminQuestions />} />
-          <Route path="exams" element={<AdminExams />} />
-          <Route path="results" element={<AdminResults />} />
-          <Route path="transcripts" element={<AdminTranscripts />} />
-          <Route path="certifications" element={<AdminCertifications />} />
-          <Route path="payments" element={<AdminPayments />} />
-          <Route path="reports" element={<AdminReports />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute roles={["admin", "lecturer"]}>
+                <AdminLayoutBridge />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="admissions" element={<AdminAdmissions />} />
+            <Route path="students" element={<AdminStudents />} />
+            <Route path="courses" element={<AdminCourses />} />
+            <Route path="lecturers" element={<AdminLecturers />} />
+            <Route path="questions" element={<AdminQuestions />} />
+            <Route path="exams" element={<AdminExams />} />
+            <Route path="results" element={<AdminResults />} />
+            <Route path="transcripts" element={<AdminTranscripts />} />
+            <Route path="certifications" element={<AdminCertifications />} />
+            <Route path="payments" element={<AdminPayments />} />
+            <Route path="reports" element={<AdminReports />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+function StudentLayoutBridge() {
+  const { user, logout } = useAuth();
+  return (
+    <StudentLayout
+      user={{
+        name: user?.name,
+        tenantName: user?.tenantName || "LIN E-Learning",
+        role: user?.role,
+        email: user?.email,
+      }}
+      // If TopBar accepts onLogout, pass it:
+      // onLogout={logout}
+    />
+  );
+}
+
+function AdminLayoutBridge() {
+  const { user, logout } = useAuth();
+  return (
+    <AdminLayout
+      user={{
+        name: user?.name,
+        tenantName: user?.tenantName || "LIN E-Learning",
+        role: user?.role,
+        email: user?.email,
+      }}
+    />
   );
 }

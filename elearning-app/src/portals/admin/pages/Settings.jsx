@@ -3,40 +3,14 @@ import { Plus, Pencil, Trash2, X, CalendarDays, Layers, Users, Clock, Award } fr
 
 // ---- Mock data -------------------------------------------------------
 
-const initialAcademicYears = [
-  { id: 1, label: "2025/2026", startDate: "2025-09-01", endDate: "2026-07-31", status: "Active" },
-  { id: 2, label: "2024/2025", startDate: "2024-09-01", endDate: "2025-07-31", status: "Closed" },
-];
-
-const initialSessions = [
-  { id: 1, label: "First Term", academicYear: "2025/2026", startDate: "2025-09-01", endDate: "2025-12-12", status: "Active" },
-  { id: 2, label: "Second Term", academicYear: "2025/2026", startDate: "2026-01-05", endDate: "2026-04-03", status: "Upcoming" },
-  { id: 3, label: "Third Term", academicYear: "2025/2026", startDate: "2026-04-20", endDate: "2026-07-31", status: "Upcoming" },
-];
-
-const initialCohorts = [
-  { id: 1, name: "Cohort 12 - Web Development", academicYear: "2025/2026", capacity: 60, enrolled: 48, status: "Active" },
-  { id: 2, name: "Cohort 13 - Data Analytics", academicYear: "2025/2026", capacity: 50, enrolled: 22, status: "Active" },
-  { id: 3, name: "Cohort 11 - Cybersecurity", academicYear: "2024/2025", capacity: 40, enrolled: 40, status: "Closed" },
-];
-
-const initialDurations = [
-  { id: 1, name: "Standard Course", value: 12, unit: "Weeks" },
-  { id: 2, name: "Bootcamp", value: 6, unit: "Weeks" },
-  { id: 3, name: "CBT Exam Window", value: 60, unit: "Minutes" },
-  { id: 4, name: "Assignment Submission", value: 7, unit: "Days" },
-];
+const initialAcademicYears = [];
+const initialSessions = [];
+const initialCohorts = [];
+const initialDurations = [];
 
 export const externalExamCategoryOptions = ["External Exam", "Certification", "Professional Exam"];
 
-const initialExternalExams = [
-  { id: 1, code: "WAEC", name: "West African Senior School Certificate (WASSCE)", provider: "WAEC", category: "External Exam", fee: "₦27,000", status: "Active" },
-  { id: 2, code: "NECO", name: "Senior School Certificate Examination", provider: "NECO", category: "External Exam", fee: "₦23,000", status: "Active" },
-  { id: 3, code: "JAMB", name: "Unified Tertiary Matriculation Examination (UTME)", provider: "JAMB", category: "External Exam", fee: "₦7,700", status: "Active" },
-  { id: 4, code: "COMPTIA-A", name: "CompTIA A+", provider: "CompTIA", category: "Professional Exam", fee: "$252", status: "Active" },
-  { id: 5, code: "AWS-CCP", name: "AWS Certified Cloud Practitioner", provider: "Amazon Web Services", category: "Professional Exam", fee: "$100", status: "Active" },
-  { id: 6, code: "PMP", name: "Project Management Professional", provider: "PMI", category: "Certification", fee: "$405", status: "Active" },
-];
+const initialExternalExams = [];
 
 // ---- Shared bits -------------------------------------------------------
 

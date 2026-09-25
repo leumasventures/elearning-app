@@ -1,36 +1,7 @@
 import { useState } from "react";
 
-const courseOptions = ["CSC101", "MTH201", "ENG150"];
-
-const initialExams = [
-  {
-    id: 1,
-    title: "Mid-Semester Test",
-    course: "CSC101",
-    duration: 60,
-    questionCount: 20,
-    startDate: "2026-09-20T09:00",
-    status: "Scheduled",
-  },
-  {
-    id: 2,
-    title: "CA2 Assessment",
-    course: "MTH201",
-    duration: 45,
-    questionCount: 15,
-    startDate: "2026-09-15T10:00",
-    status: "Active",
-  },
-  {
-    id: 3,
-    title: "First Semester Final",
-    course: "ENG150",
-    duration: 90,
-    questionCount: 30,
-    startDate: "2026-08-01T09:00",
-    status: "Closed",
-  },
-];
+const courseOptions = [];
+const initialExams = [];
 
 const emptyForm = {
   title: "",

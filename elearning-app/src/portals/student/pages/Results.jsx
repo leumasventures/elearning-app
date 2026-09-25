@@ -1,12 +1,8 @@
 import { useState } from "react";
 
-const courseOptions = ["All Courses", "CSC101", "MTH201", "ENG150"];
+const courseOptions = ["All Courses", ""];
 
-const initialResults = [
-  { id: 1, exam: "Mid-Semester Test", course: "CSC101", score: 82, total: 100, date: "2026-09-08" },
-  { id: 2, exam: "First Semester Final", course: "ENG150", score: 90, total: 100, date: "2026-08-01" },
-  { id: 3, exam: "CA1 Assessment", course: "MTH201", score: 55, total: 100, date: "2026-07-20" },
-];
+const initialResults = [];
 
 function getGrade(percent) {
   if (percent >= 70) return "A";

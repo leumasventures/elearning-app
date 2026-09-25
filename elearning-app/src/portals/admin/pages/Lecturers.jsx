@@ -1,33 +1,7 @@
 import { useState } from "react";
 
-const courseOptions = ["CSC101", "MTH201", "ENG150"];
-
-const initialLecturers = [
-  {
-    id: 1,
-    name: "Dr. A. Obi",
-    email: "a.obi@school.edu",
-    department: "Computer Science",
-    courses: ["CSC101"],
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Prof. F. Adeyemi",
-    email: "f.adeyemi@school.edu",
-    department: "Mathematics",
-    courses: ["MTH201"],
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Mrs. C. Nwosu",
-    email: "c.nwosu@school.edu",
-    department: "Languages",
-    courses: ["ENG150"],
-    status: "On Leave",
-  },
-];
+const courseOptions = [];
+const initialLecturers = [];
 
 const emptyForm = {
   name: "",

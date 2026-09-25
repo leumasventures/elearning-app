@@ -1,37 +1,6 @@
 import { useState } from "react";
 
-const initialAssignments = [
-  {
-    id: 1,
-    title: "Loops and Conditionals Exercise",
-    course: "CSC101",
-    dueDate: "2026-09-20T23:59",
-    status: "Pending",
-    score: null,
-    maxScore: 20,
-    submittedAt: null,
-  },
-  {
-    id: 2,
-    title: "Limits and Continuity Problem Set",
-    course: "MTH201",
-    dueDate: "2026-09-16T23:59",
-    status: "Submitted",
-    score: null,
-    maxScore: 15,
-    submittedAt: "2026-09-14T18:32",
-  },
-  {
-    id: 3,
-    title: "Business Memo Draft",
-    course: "ENG150",
-    dueDate: "2026-09-05T23:59",
-    status: "Graded",
-    score: 18,
-    maxScore: 20,
-    submittedAt: "2026-09-04T14:10",
-  },
-];
+const initialAssignments = [];
 
 function formatDate(value) {
   if (!value) return "—";

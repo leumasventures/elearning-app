@@ -1,26 +1,228 @@
+// ─── helpers (inlined so no missing-file errors) ───────────────────────────
+
+function monitorProgram(p, now = new Date()) {
+  const start = p.startDate ? new Date(p.startDate) : null;
+  const end = p.endDate
+    ? new Date(p.endDate)
+    : start && p.durationWeeks
+      ? new Date(start.getTime() + p.durationWeeks * 7 * 24 * 60 * 60 * 1000)
+      : null;
+
+  const durationDays =
+    start && end
+      ? Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)))
+      : (p.durationWeeks || 0) * 7;
+
+  const elapsed = start
+    ? Math.max(0, Math.round((now - start) / (1000 * 60 * 60 * 24)))
+    : 0;
+
+  const remaining = end
+    ? Math.max(0, Math.round((end - now) / (1000 * 60 * 60 * 24)))
+    : Math.max(0, durationDays - elapsed);
+
+  const timeUsedPct =
+    durationDays > 0 ? Math.round((elapsed / durationDays) * 100) : 0;
+  const progress = Number(p.progress ?? 0);
+
+  let status = "On track";
+  if (progress >= 100) status = "Completed";
+  else if (remaining === 0 && progress < 100) status = "Overdue";
+  else if (timeUsedPct > progress + 15) status = "At risk";
+
+  return {
+    durationWeeks: p.durationWeeks ?? Math.round(durationDays / 7),
+    elapsed,
+    remaining,
+    timeUsedPct,
+    progress,
+    status,
+  };
+}
+
+function statusStyles(status) {
+  switch (status) {
+    case "Completed":
+      return "bg-emerald-100 text-emerald-800";
+    case "On track":
+      return "bg-sky-100 text-sky-800";
+    case "At risk":
+      return "bg-amber-100 text-amber-800";
+    case "Overdue":
+      return "bg-rose-100 text-rose-800";
+    default:
+      return "bg-slate-100 text-slate-600";
+  }
+}
+
+function Bar({ value, colorClass }) {
+  const pct = Math.min(Math.max(Number(value) || 0, 0), 100);
+  return (
+    <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+      <div
+        className={`h-full rounded-full transition-all duration-500 ${colorClass}`}
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  );
+}
+
+function LearnerProgramDurationPanel({ programs = [] }) {
+  const monitored = programs.map((p) => ({ ...p, ...monitorProgram(p) }));
+  const atRisk = monitored.filter(
+    (p) => p.status === "At risk" || p.status === "Overdue"
+  ).length;
+  const completed = monitored.filter((p) => p.status === "Completed").length;
+
+  return (
+    <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-slate-900">
+            Learner program duration
+          </h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Planned length vs time used and completion progress
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+            {monitored.length} active
+          </span>
+          {completed > 0 && (
+            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+              {completed} completed
+            </span>
+          )}
+          {atRisk > 0 && (
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+              {atRisk} need attention
+            </span>
+          )}
+        </div>
+      </div>
+
+      {monitored.length === 0 ? (
+        <p className="mt-4 text-sm text-slate-400">
+          No learner programs yet. Durations appear when students are enrolled.
+        </p>
+      ) : (
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 text-xs text-slate-500">
+                <th className="pb-2 pr-3 font-medium">Learner</th>
+                <th className="pb-2 pr-3 font-medium">Program</th>
+                <th className="pb-2 pr-3 font-medium">Duration</th>
+                <th className="pb-2 pr-3 font-medium">Time used</th>
+                <th className="pb-2 pr-3 font-medium">Progress</th>
+                <th className="pb-2 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {monitored.map((p) => (
+                <tr
+                  key={p.id ?? `${p.matric}-${p.courseCode}`}
+                  className="align-top"
+                >
+                  <td className="py-3 pr-3">
+                    <p className="font-medium text-slate-900">
+                      {p.student ?? "—"}
+                    </p>
+                    <p className="text-xs text-slate-500">{p.matric ?? ""}</p>
+                  </td>
+                  <td className="py-3 pr-3">
+                    <p className="text-slate-800">{p.program ?? "—"}</p>
+                    <p className="text-xs text-slate-500">{p.courseCode ?? ""}</p>
+                  </td>
+                  <td className="py-3 pr-3 text-slate-700">
+                    <p>{p.durationWeeks ?? 0} weeks</p>
+                    <p className="text-xs text-slate-500">
+                      {p.remaining ?? 0}d left
+                    </p>
+                  </td>
+                  <td className="min-w-[120px] py-3 pr-3">
+                    <div className="mb-1 flex justify-between text-xs text-slate-600">
+                      <span>{p.timeUsedPct ?? 0}%</span>
+                      <span>{p.elapsed ?? 0}d</span>
+                    </div>
+                    <Bar
+                      value={p.timeUsedPct}
+                      colorClass={
+                        (p.timeUsedPct ?? 0) >= 100
+                          ? "bg-rose-500"
+                          : (p.timeUsedPct ?? 0) >= 75
+                          ? "bg-amber-500"
+                          : "bg-indigo-500"
+                      }
+                    />
+                  </td>
+                  <td className="min-w-[120px] py-3 pr-3">
+                    <div className="mb-1 flex justify-between text-xs text-slate-600">
+                      <span>{p.progress ?? 0}%</span>
+                    </div>
+                    <Bar
+                      value={p.progress}
+                      colorClass={
+                        (p.progress ?? 0) >= 100
+                          ? "bg-emerald-500"
+                          : "bg-sky-500"
+                      }
+                    />
+                  </td>
+                  <td className="py-3">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusStyles(
+                        p.status
+                      )}`}
+                    >
+                      {p.status ?? "—"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── page data ─────────────────────────────────────────────────────────────
+
 const student = {
   name: "Chinedu Okafor",
   matric: "CSC/2023/041",
 };
 
 const enrolledCourses = [
-  { id: 1, code: "CSC101", title: "Introduction to Programming", progress: 65, color: "indigo" },
-  { id: 2, code: "MTH201", title: "Calculus II", progress: 40, color: "violet" },
-  { id: 3, code: "ENG150", title: "Technical Writing", progress: 100, color: "emerald" },
+  {
+    id: 1,
+    code: "CSC101",
+    title: "Introduction to Programming",
+    progress: 65,
+    color: "indigo",
+  },
 ];
 
-const upcomingAssignments = [
-  { id: 1, title: "Loops and Conditionals Exercise", course: "CSC101", dueDate: "2026-09-20T23:59" },
-  { id: 2, title: "Limits and Continuity Problem Set", course: "MTH201", dueDate: "2026-09-16T23:59" },
+const learnerPrograms = [
+  {
+    id: "e1",
+    student: "Chinedu Okafor",
+    matric: "CSC/2023/041",
+    program: "Diploma in Web Development",
+    courseCode: "WEBDEV-D",
+    durationWeeks: 24,
+    startDate: "2026-03-01",
+    endDate: "2026-08-31",
+    progress: 45,
+  },
 ];
 
-const upcomingExams = [
-  { id: 1, title: "Mid-Semester Test", course: "CSC101", date: "2026-09-22T09:00" },
-];
-
-const recentResults = [
-  { id: 1, exam: "First Semester Final", course: "ENG150", score: 18, total: 20 },
-];
+const upcomingAssignments = [];
+const upcomingExams = [];
+const recentResults = [];
 
 function formatDate(value) {
   return new Date(value).toLocaleDateString(undefined, {
@@ -134,11 +336,16 @@ const stats = [
   },
 ];
 
+// ─── page ──────────────────────────────────────────────────────────────────
+
 export default function Dashboard() {
-  const avgProgress = Math.round(
-    enrolledCourses.reduce((sum, c) => sum + c.progress, 0) /
-      enrolledCourses.length
-  );
+  const avgProgress =
+    enrolledCourses.length === 0
+      ? 0
+      : Math.round(
+          enrolledCourses.reduce((sum, c) => sum + c.progress, 0) /
+            enrolledCourses.length
+        );
 
   const values = {
     courses: enrolledCourses.length,
@@ -202,7 +409,9 @@ export default function Dashboard() {
         {/* Course Progress */}
         <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-900">Course Progress</h2>
+            <h2 className="text-sm font-semibold text-slate-900">
+              Course Progress
+            </h2>
             <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 ring-1 ring-indigo-100">
               {enrolledCourses.length} courses
             </span>
@@ -321,9 +530,6 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-semibold text-rose-800 ring-1 ring-rose-200/80">
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
                     {formatDate(e.date)}
                   </span>
                 </div>
@@ -333,10 +539,15 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Inlined panel — no external import */}
+      <LearnerProgramDurationPanel programs={learnerPrograms} />
+
       {/* Recent Results */}
       <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-900">Recent Results</h2>
+          <h2 className="text-sm font-semibold text-slate-900">
+            Recent Results
+          </h2>
           <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-100">
             Latest scores
           </span>
@@ -371,12 +582,6 @@ export default function Dashboard() {
                   <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-200/80">
                     {percent}%
                   </span>
-                  <div className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-emerald-100 sm:block">
-                    <div
-                      className="h-full rounded-full bg-emerald-500"
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
                 </div>
               </div>
             );

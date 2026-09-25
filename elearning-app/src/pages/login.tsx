@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import type { Role } from "../lib/api";
+
 
 export default function Login() {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,94 +14,101 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    try {
-      // TODO: replace with real API call
-      // const res = await fetch("/api/auth/login", { ... });
-      // const data = await res.json();
-
-      // Temporary mock — remove when backend is ready
-      await new Promise((r) => setTimeout(r, 800));
-
-      if (!email || !password) {
-        throw new Error("Please enter both email and password.");
-      }
-
-      // Mock role-based redirect
-      if (role === "admin") {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (role === "lecturer") {
-        // When lecturer portal exists:
-        // navigate("/lecturer/dashboard", { replace: true });
-        navigate("/admin/dashboard", { replace: true });
-      } else {
-        navigate("/student/dashboard", { replace: true });
-      }
-    } catch (err) {
-      setError(err.message || "Login failed. Please try again.");
-    } finally {
-      setLoading(false);
+  try {
+    if (!email.trim() || !password) {
+      throw new Error("Please enter both email and password.");
     }
+
+    const user = await login(email.trim(), password, role as Role);
+
+    if (user.role === "admin" || user.role === "lecturer") {
+      navigate("/admin/dashboard", { replace: true });
+    } else {
+      navigate("/student/dashboard", { replace: true });
+    }
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Login failed. Please try again.";
+    setError(message);
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <div className="flex min-h-screen bg-slate-50">
       {/* Left panel – branding */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-slate-900 px-12 py-10 text-white">
-        <div>
-          <p className="text-sm font-medium tracking-wide text-slate-400">
-            E-Learning Platform
-          </p>
-          <h1 className="mt-6 text-3xl font-semibold leading-tight">
+      <div className="relative hidden overflow-hidden lg:flex lg:w-1/2 flex-col justify-between bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 px-12 py-10 text-white">
+        <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+
+        <div className="relative">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 shadow-lg backdrop-blur">
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold tracking-tight">E-Learning</p>
+              <p className="text-xs text-indigo-200">LIN Platform</p>
+            </div>
+          </div>
+
+          <h1 className="mt-10 text-3xl font-semibold leading-tight tracking-tight">
             Learn. Examine.
             <br />
             Succeed.
           </h1>
-          <p className="mt-4 max-w-sm text-sm text-slate-400">
+          <p className="mt-4 max-w-sm text-sm text-indigo-100/90">
             Access courses, take CBT exams, track progress, and manage results
             — all in one secure platform.
           </p>
         </div>
 
-        <div className="space-y-4 text-sm text-slate-400">
-          <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-medium text-white">
-              1
-            </span>
-            <span>Student, lecturer & admin portals</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-medium text-white">
-              2
-            </span>
-            <span>Secure CBT examination engine</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-medium text-white">
-              3
-            </span>
-            <span>Real-time results & progress tracking</span>
-          </div>
+        <div className="relative space-y-4 text-sm">
+          {[
+            "Student, lecturer & admin portals",
+            "Secure CBT examination engine",
+            "Real-time results & progress tracking",
+          ].map((text, i) => (
+            <div key={text} className="flex items-center gap-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-xs font-bold text-white backdrop-blur">
+                {i + 1}
+              </span>
+              <span className="text-indigo-100">{text}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Right panel – form */}
       <div className="flex w-full flex-col justify-center px-6 py-12 lg:w-1/2 lg:px-16">
         <div className="mx-auto w-full max-w-md">
-          {/* Mobile logo / title */}
+          {/* Mobile brand */}
           <div className="mb-8 lg:hidden">
-            <p className="text-sm font-medium text-slate-500">E-Learning Platform</p>
-            <h1 className="mt-1 text-2xl font-semibold text-slate-900">
+            <div className="mb-4 flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md">
+                <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                </svg>
+              </div>
+              <span className="text-sm font-semibold text-slate-800">E-Learning</span>
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
               Sign in to your account
             </h1>
           </div>
 
-          <div className="hidden lg:block mb-8">
-            <h2 className="text-2xl font-semibold text-slate-900">
+          <div className="mb-8 hidden lg:block">
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
               Sign in to your account
             </h2>
             <p className="mt-1 text-sm text-slate-500">
@@ -108,7 +119,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Role selector */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
                 I am a
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -122,9 +133,9 @@ export default function Login() {
                     type="button"
                     onClick={() => setRole(opt.value)}
                     className={[
-                      "rounded-md border px-3 py-2 text-sm font-medium transition-colors",
+                      "rounded-xl border px-3 py-2.5 text-sm font-semibold transition",
                       role === opt.value
-                        ? "border-slate-900 bg-slate-900 text-white"
+                        ? "border-transparent bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-200/40"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
                     ].join(" ")}
                   >
@@ -138,7 +149,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-slate-700 mb-1.5"
+                className="mb-1.5 block text-sm font-medium text-slate-700"
               >
                 {role === "student" ? "Email or Matric No." : "Email"}
               </label>
@@ -153,14 +164,14 @@ export default function Login() {
                     ? "you@school.edu or CSC/2023/041"
                     : "you@school.edu"
                 }
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 required
               />
             </div>
 
             {/* Password */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="mb-1.5 flex items-center justify-between">
                 <label
                   htmlFor="password"
                   className="block text-sm font-medium text-slate-700"
@@ -169,7 +180,7 @@ export default function Login() {
                 </label>
                 <a
                   href="#forgot"
-                  className="text-xs font-medium text-slate-500 hover:text-slate-900"
+                  className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
                 >
                   Forgot password?
                 </a>
@@ -182,13 +193,13 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -205,18 +216,16 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Error */}
             {error && (
-              <div className="rounded-md border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <div className="rounded-xl border border-red-100 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
                 {error}
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900/20 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200/40 transition hover:from-indigo-700 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -234,7 +243,10 @@ export default function Login() {
 
           <p className="mt-8 text-center text-sm text-slate-500">
             Don&apos;t have an account?{" "}
-            <a href="#register" className="font-medium text-slate-900 hover:underline">
+            <a
+              href="#register"
+              className="font-semibold text-indigo-600 hover:text-indigo-800"
+            >
               Contact your institution
             </a>
           </p>
