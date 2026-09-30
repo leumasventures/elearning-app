@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://api.elearning.leumasitnexus.com:4000/api";
 
 const ACCESS_KEY = "lea_access_token";
 const REFRESH_KEY = "lea_refresh_token";

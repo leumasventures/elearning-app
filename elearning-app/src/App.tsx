@@ -95,7 +95,7 @@ export default function App() {
 }
 
 function StudentLayoutBridge() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   return (
     <StudentLayout
       user={{
@@ -111,7 +111,7 @@ function StudentLayoutBridge() {
 }
 
 function AdminLayoutBridge() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   return (
     <AdminLayout
       user={{
