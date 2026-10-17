@@ -1,23 +1,11 @@
 import { useState } from "react";
 
-const courseCatalog = [
-  { code: "CSC101", title: "Introduction to Computer Science", duration: "12 Weeks", certification: "Certificate of Completion" },
-  { code: "WEBDEV-D", title: "Diploma in Web Development", duration: "6 Months", certification: "Diploma" },
-  { code: "CYBSEC-P", title: "Cybersecurity Fundamentals", duration: "3 Months", certification: "Professional Certification" },
-  { code: "DATA-B", title: "Data Analysis Bootcamp", duration: "6 Weeks", certification: "Certificate of Proficiency" },
-];
+const courseCatalog = [];
 
-const externalExamCatalog = [
-  { code: "WAEC", name: "WASSCE", provider: "WAEC", category: "External Exam", fee: "₦27,000" },
-  { code: "NECO", name: "SSCE", provider: "NECO", category: "External Exam", fee: "₦23,000" },
-  { code: "JAMB", name: "UTME", provider: "JAMB", category: "External Exam", fee: "₦7,700" },
-  { code: "COMPTIA-A", name: "CompTIA A+", provider: "CompTIA", category: "Professional Exam", fee: "$252" },
-  { code: "AWS-CCP", name: "AWS Certified Cloud Practitioner", provider: "Amazon Web Services", category: "Professional Exam", fee: "$100" },
-  { code: "PMP", name: "Project Management Professional", provider: "PMI", category: "Certification", fee: "$405" },
-];
+const externalExamCatalog = [];
 
 const applicationTypeOptions = ["Course Admission", "External Exam / Certification"];
-const intakeOptions = ["January 2026", "May 2026", "September 2026", "January 2027"];
+const intakeOptions = [];
 
 const initialApplicants = [];
 

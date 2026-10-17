@@ -1,4 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL || "https://api.elearning.leumasitnexus.com:4000/api";
+const API_URL = (
+  import.meta.env.VITE_API_URL ||
+  "https://api.elearning.leumasitnexus.com/api"
+).replace(/\/+$/, "");
 
 const ACCESS_KEY = "lea_access_token";
 const REFRESH_KEY = "lea_refresh_token";
@@ -88,7 +91,7 @@ export async function apiRequest<T = unknown>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
-  // One retry after refresh on 401
+  // Retry once after refresh on 401
   if (res.status === 401 && auth) {
     const newToken = await refreshAccessToken();
     if (newToken) {
@@ -132,8 +135,24 @@ export async function meApi(): Promise<AuthUser> {
 
 export async function logoutApi(): Promise<void> {
   try {
-    await apiRequest("/auth/logout", { method: "POST" });
+    const refreshToken = getRefreshToken();
+    await apiRequest("/auth/logout", {
+      method: "POST",
+      body: { refreshToken },
+    });
   } finally {
     clearTokens();
   }
+}
+
+// ── Data APIs (all from database) ──────────────────────────
+
+export async function getUsers() {
+  return apiRequest<AuthUser[]>("/users");
+}
+
+export async function getCourses() {
+  return apiRequest<
+    { id: string; title: string; code: string; description?: string }[]
+  >("/courses");
 }
