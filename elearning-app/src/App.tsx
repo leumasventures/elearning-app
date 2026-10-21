@@ -28,6 +28,9 @@ import AdminPayments from "./portals/admin/pages/Payments";
 import AdminReports from "./portals/admin/pages/Reports";
 import AdminSettings from "./portals/admin/pages/Settings";
 
+import RegisterStudent from "./portals/admin/pages/RegisterStudent";
+import RegisterCourse from "./portals/admin/pages/RegisterCourse";
+
 function HomeRedirect() {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -87,6 +90,9 @@ export default function App() {
             <Route path="payments" element={<AdminPayments />} />
             <Route path="reports" element={<AdminReports />} />
             <Route path="settings" element={<AdminSettings />} />
+            
+            <Route path="register-student" element={<RegisterStudent />} />
+            <Route path="register-course" element={<RegisterCourse />} />
           </Route>
         </Routes>
       </BrowserRouter>
