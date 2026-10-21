@@ -23,6 +23,77 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
+export interface Course {
+  id: string;
+  code: string;
+  title: string;
+  lecturerId?: string | null;
+  lecturerName?: string;
+  units?: number;
+  duration?: string;
+  certification?: string;
+  status?: "Active" | "Draft";
+  description?: string;
+}
+
+export interface Lesson {
+  id: string;
+  courseId: string;
+  title: string;
+  duration: string;
+  order: number;
+  content: string;
+}
+
+export interface Enrollment {
+  id: string;
+  userId: string;
+  courseId: string;
+  progress: number;
+  lessonsCompleted: number;
+  enrolledAt: string;
+  course?: Course;
+  totalLessons?: number;
+}
+
+export interface Question {
+  id: string;
+  courseId: string;
+  type: "MCQ" | "True/False";
+  text: string;
+  options: string[];
+  correctIndex?: number;
+  points: number;
+}
+
+export interface Exam {
+  id: string;
+  title: string;
+  courseId: string;
+  durationMinutes: number;
+  questionIds: string[];
+  startDate: string;
+  status: "Scheduled" | "Active" | "Closed";
+  courseCode?: string;
+  questionCount?: number;
+}
+
+export interface ExamResult {
+  id: string;
+  userId: string;
+  examId: string;
+  courseId: string;
+  score: number;
+  total: number;
+  submittedAt: string;
+  student?: string;
+  matric?: string | null;
+  examTitle?: string;
+  courseCode?: string;
+  percent?: number;
+}
+
+/** Auth tokens only — SPA session. All business data lives in MySQL. */
 export function getAccessToken() {
   return localStorage.getItem(ACCESS_KEY);
 }
@@ -91,7 +162,6 @@ export async function apiRequest<T = unknown>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
-  // Retry once after refresh on 401
   if (res.status === 401 && auth) {
     const newToken = await refreshAccessToken();
     if (newToken) {
@@ -116,6 +186,8 @@ export async function apiRequest<T = unknown>(
 
   return data as T;
 }
+
+// ── Auth ───────────────────────────────────────────────────
 
 export async function loginApi(payload: {
   email: string;
@@ -145,14 +217,274 @@ export async function logoutApi(): Promise<void> {
   }
 }
 
-// ── Data APIs (all from database) ──────────────────────────
+// ── Users (DB) ─────────────────────────────────────────────
+// Backend GET /users → { count, users }
 
-export async function getUsers() {
-  return apiRequest<AuthUser[]>("/users");
+export async function getUsers(): Promise<AuthUser[]> {
+  const data = await apiRequest<
+    { users?: AuthUser[]; count?: number } | AuthUser[]
+  >("/users");
+  if (Array.isArray(data)) return data;
+  return data.users ?? [];
 }
 
-export async function getCourses() {
-  return apiRequest<
-    { id: string; title: string; code: string; description?: string }[]
+export async function createUser(body: {
+  name: string;
+  email: string;
+  password: string;
+  matric?: string | null;
+  role?: Role;
+}): Promise<AuthUser> {
+  const data = await apiRequest<{ user: AuthUser }>("/auth/register", {
+    method: "POST",
+    body,
+    auth: true,
+  });
+  return data.user;
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  await apiRequest(`/users/${id}`, { method: "DELETE" });
+}
+
+export async function updateUser(
+  id: string,
+  body: Partial<Pick<AuthUser, "name" | "email" | "matric" | "role">>
+): Promise<AuthUser> {
+  const data = await apiRequest<{ user: AuthUser }>(`/users/${id}`, {
+    method: "PUT",
+    body,
+  });
+  return data.user;
+}
+
+// ── Courses (DB) ───────────────────────────────────────────
+// Backend GET /courses → { count, courses }
+
+export async function getCourses(): Promise<Course[]> {
+  const data = await apiRequest<
+    { courses?: Course[]; count?: number } | Course[]
   >("/courses");
+  if (Array.isArray(data)) return data;
+  return data.courses ?? [];
+}
+
+export async function getCourse(idOrCode: string): Promise<Course> {
+  const data = await apiRequest<{ course: Course }>(`/courses/${idOrCode}`);
+  return data.course;
+}
+
+export async function createCourse(body: {
+  code: string;
+  title: string;
+  lecturerName?: string;
+  lecturerId?: string | null;
+  units?: number;
+  duration?: string;
+  certification?: string;
+  status?: "Active" | "Draft";
+  description?: string;
+}): Promise<Course> {
+  const data = await apiRequest<{ course: Course }>("/courses", {
+    method: "POST",
+    body,
+  });
+  return data.course;
+}
+
+export async function deleteCourse(id: string): Promise<void> {
+  await apiRequest(`/courses/${id}`, { method: "DELETE" });
+}
+
+// ── Lessons (DB) ───────────────────────────────────────────
+
+export async function getLessons(courseId?: string): Promise<Lesson[]> {
+  const q = courseId ? `?courseId=${encodeURIComponent(courseId)}` : "";
+  const data = await apiRequest<{ lessons?: Lesson[]; count?: number }>(
+    `/lessons${q}`
+  );
+  return data.lessons ?? [];
+}
+
+export async function createLesson(body: {
+  courseId: string;
+  title: string;
+  duration?: string;
+  content?: string;
+  order?: number;
+}): Promise<Lesson> {
+  const data = await apiRequest<{ lesson: Lesson }>("/lessons", {
+    method: "POST",
+    body,
+  });
+  return data.lesson;
+}
+
+export async function updateLesson(
+  id: string,
+  body: Partial<Pick<Lesson, "title" | "duration" | "content" | "order">>
+): Promise<Lesson> {
+  const data = await apiRequest<{ lesson: Lesson }>(`/lessons/${id}`, {
+    method: "PUT",
+    body,
+  });
+  return data.lesson;
+}
+
+export async function deleteLesson(id: string): Promise<void> {
+  await apiRequest(`/lessons/${id}`, { method: "DELETE" });
+}
+
+// ── Enrollments (DB) ───────────────────────────────────────
+
+export async function getEnrollments(userId?: string): Promise<Enrollment[]> {
+  const q = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+  const data = await apiRequest<{
+    enrollments?: Enrollment[];
+    count?: number;
+  }>(`/enrollments${q}`);
+  return data.enrollments ?? [];
+}
+
+export async function enrollInCourse(
+  courseId: string,
+  userId?: string
+): Promise<Enrollment> {
+  const data = await apiRequest<{ enrollment: Enrollment }>("/enrollments", {
+    method: "POST",
+    body: { courseId, ...(userId ? { userId } : {}) },
+  });
+  return data.enrollment;
+}
+
+export async function updateEnrollmentProgress(
+  id: string,
+  fields: { progress?: number; lessonsCompleted?: number }
+): Promise<void> {
+  await apiRequest(`/enrollments/${id}/progress`, {
+    method: "PATCH",
+    body: fields,
+  });
+}
+
+// ── Questions (DB) ─────────────────────────────────────────
+
+export async function getQuestions(courseId?: string): Promise<Question[]> {
+  const q = courseId ? `?courseId=${encodeURIComponent(courseId)}` : "";
+  const data = await apiRequest<{ questions?: Question[]; count?: number }>(
+    `/questions${q}`
+  );
+  return data.questions ?? [];
+}
+
+export async function createQuestion(body: {
+  courseId: string;
+  type?: "MCQ" | "True/False";
+  text: string;
+  options: string[];
+  correctIndex?: number;
+  points?: number;
+}): Promise<Question> {
+  const data = await apiRequest<{ question: Question }>("/questions", {
+    method: "POST",
+    body,
+  });
+  return data.question;
+}
+
+export async function updateQuestion(
+  id: string,
+  body: Partial<
+    Pick<Question, "text" | "options" | "correctIndex" | "points" | "type">
+  >
+): Promise<Question> {
+  const data = await apiRequest<{ question: Question }>(`/questions/${id}`, {
+    method: "PUT",
+    body,
+  });
+  return data.question;
+}
+
+export async function deleteQuestion(id: string): Promise<void> {
+  await apiRequest(`/questions/${id}`, { method: "DELETE" });
+}
+
+// ── Exams (DB) ─────────────────────────────────────────────
+
+export async function getExams(courseId?: string): Promise<Exam[]> {
+  const q = courseId ? `?courseId=${encodeURIComponent(courseId)}` : "";
+  const data = await apiRequest<{ exams?: Exam[]; count?: number }>(
+    `/exams${q}`
+  );
+  return data.exams ?? [];
+}
+
+export async function getExam(id: string): Promise<{
+  exam: Exam;
+  questions: Question[];
+}> {
+  return apiRequest(`/exams/${id}`);
+}
+
+export async function createExam(body: {
+  title: string;
+  courseId: string;
+  durationMinutes?: number;
+  questionIds?: string[];
+  startDate?: string;
+  status?: Exam["status"];
+}): Promise<Exam> {
+  const data = await apiRequest<{ exam: Exam }>("/exams", {
+    method: "POST",
+    body,
+  });
+  return data.exam;
+}
+
+export async function updateExam(
+  id: string,
+  body: Partial<{
+    title: string;
+    durationMinutes: number;
+    questionIds: string[];
+    startDate: string;
+    status: Exam["status"];
+  }>
+): Promise<Exam> {
+  const data = await apiRequest<{ exam: Exam }>(`/exams/${id}`, {
+    method: "PUT",
+    body,
+  });
+  return data.exam;
+}
+
+export async function deleteExam(id: string): Promise<void> {
+  await apiRequest(`/exams/${id}`, { method: "DELETE" });
+}
+
+export async function submitExam(
+  id: string,
+  answers: Record<string, number>
+): Promise<ExamResult> {
+  const data = await apiRequest<{ result: ExamResult }>(`/exams/${id}/submit`, {
+    method: "POST",
+    body: { answers },
+  });
+  return data.result;
+}
+
+// ── Results (DB) ───────────────────────────────────────────
+
+export async function getResults(filters?: {
+  userId?: string;
+  courseId?: string;
+}): Promise<ExamResult[]> {
+  const params = new URLSearchParams();
+  if (filters?.userId) params.set("userId", filters.userId);
+  if (filters?.courseId) params.set("courseId", filters.courseId);
+  const q = params.toString() ? `?${params}` : "";
+  const data = await apiRequest<{ results?: ExamResult[]; count?: number }>(
+    `/results${q}`
+  );
+  return data.results ?? [];
 }
